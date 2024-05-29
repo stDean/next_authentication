@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useTransition, useState } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,10 +16,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import FormError from "@/components/FormError";
+import FormSuccess from "@/components/FormSuccess";
+import { login } from "@/actions/login";
 
 interface LoginFormProps {}
 
 const LoginForm: FC<LoginFormProps> = () => {
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -27,6 +34,18 @@ const LoginForm: FC<LoginFormProps> = () => {
       password: "",
     },
   });
+
+  const handleSubmit = (values: z.infer<typeof LoginSchema>) => {
+    setError("");
+    setSuccess("");
+
+    startTransition(() => {
+      login(values).then(data => {
+        setError(data.error);
+        setSuccess(data.success);
+      });
+    });
+  };
 
   return (
     <CardWrapper
@@ -36,7 +55,8 @@ const LoginForm: FC<LoginFormProps> = () => {
       showSocials
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(() => {})} className="space-y-6">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          {/* INPUTS */}
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -46,6 +66,7 @@ const LoginForm: FC<LoginFormProps> = () => {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
+                      disabled={isPending}
                       {...field}
                       placeholder="john.doe@example.com"
                       type="email"
@@ -63,7 +84,12 @@ const LoginForm: FC<LoginFormProps> = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="******" type="password" />
+                    <Input
+                      disabled={isPending}
+                      {...field}
+                      placeholder="******"
+                      type="password"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -71,7 +97,14 @@ const LoginForm: FC<LoginFormProps> = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full">
+          {/* FORM ERROR */}
+          <FormError message={error} />
+
+          {/* FORM SUCCESS */}
+          <FormSuccess message={success} />
+
+          {/* LOGIN BUTTON */}
+          <Button type="submit" className="w-full" disabled={isPending}>
             Login
           </Button>
         </form>
