@@ -4,9 +4,7 @@ import { FC } from "react";
 interface LoginPageProps {}
 
 const LoginPage: FC<LoginPageProps> = () => {
-  return (
-    <LoginForm />
-  );
+  return <LoginForm />;
 };
 
 export default LoginPage;
