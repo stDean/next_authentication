@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 import { FC } from "react";
 
 interface SettingsPageProps {}
@@ -9,6 +9,15 @@ const SettingsPage: FC<SettingsPageProps> = async () => {
   return (
     <div>
       <p>{JSON.stringify(session)}</p>
+      <form
+        action={async () => {
+          "use server";
+
+          await signOut();
+        }}
+      >
+        <button type="submit">Log Out</button>
+      </form>
     </div>
   );
 };
