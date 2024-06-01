@@ -1,7 +1,16 @@
-import NextAuth from "next-auth";
+import NextAuth, { type DefaultSession } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import authConfig from "@/auth.config";
 import { db } from "@/lib/db";
+import { getUserById } from "./data/user";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      role: string;
+    } & DefaultSession["user"];
+  }
+}
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
@@ -9,12 +18,21 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
-      console.log({ sessionToken: token, session });
 
+      if (session.user && token.role) {
+        session.user.role = token.role;
+      }
       return session;
     },
-    async jwt({ token, user }) {
-      console.log({ jwtToken: token, user });
+    async jwt({ token }) {
+      if (!token.sub) return token;
+
+      const dbUser = await getUserById(token.sub);
+      if (!dbUser) {
+        return token;
+      }
+
+      token.role = dbUser.role;
       return token;
     },
   },
