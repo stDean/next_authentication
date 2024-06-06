@@ -1,13 +1,11 @@
 "use client";
 
 import { FC, useTransition, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CardWrapper from "@/components/auth/CardWrapper";
-import { LoginSchema } from "@/schemas";
+import { ResetSchema } from "@/schemas";
 import {
   Form,
   FormControl,
@@ -20,35 +18,28 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import FormError from "@/components/FormError";
 import FormSuccess from "@/components/FormSuccess";
-import { login } from "@/actions/login";
+import { reset } from "@/actions/reset";
 
-interface LoginFormProps {}
+interface ResetFormProps {}
 
-const LoginForm: FC<LoginFormProps> = () => {
+const ResetForm: FC<ResetFormProps> = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
-  const searchParams = useSearchParams();
-  const urlError =
-    searchParams.get("error") === "OAuthAccountNotLinked"
-      ? "Email already in use with a different provider"
-      : "";
-
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<z.infer<typeof ResetSchema>>({
+    resolver: zodResolver(ResetSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof LoginSchema>) => {
+  const handleSubmit = (values: z.infer<typeof ResetSchema>) => {
     setError("");
     setSuccess("");
 
     startTransition(() => {
-      login(values).then(data => {
+      reset(values).then(data => {
         setError(data?.error);
         setSuccess(data?.success);
       });
@@ -57,10 +48,9 @@ const LoginForm: FC<LoginFormProps> = () => {
 
   return (
     <CardWrapper
-      headerLabel="Welcome Back"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/register"
-      showSocials
+      headerLabel="Forgot Password?"
+      backButtonLabel="back to login"
+      backButtonHref="/login"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -80,34 +70,7 @@ const LoginForm: FC<LoginFormProps> = () => {
                       type="email"
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isPending}
-                      {...field}
-                      placeholder="******"
-                      type="password"
-                    />
-                  </FormControl>
-
-                  <Button
-                    size="sm"
-                    variant="link"
-                    asChild
-                    className="px-0 font-normal"
-                  >
-                    <Link href="/reset">Forgot Password?</Link>
-                  </Button>
                   <FormMessage />
                 </FormItem>
               )}
@@ -115,14 +78,14 @@ const LoginForm: FC<LoginFormProps> = () => {
           </div>
 
           {/* FORM ERROR */}
-          <FormError message={error || urlError} />
+          <FormError message={error} />
 
           {/* FORM SUCCESS */}
           <FormSuccess message={success} />
 
           {/* LOGIN BUTTON */}
           <Button type="submit" className="w-full" disabled={isPending}>
-            Login
+            Send Reset Email
           </Button>
         </form>
       </Form>
@@ -130,4 +93,4 @@ const LoginForm: FC<LoginFormProps> = () => {
   );
 };
 
-export default LoginForm;
+export default ResetForm;
