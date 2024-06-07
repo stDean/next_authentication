@@ -10,7 +10,13 @@ export const publicRoutes = ["/", "/new-verification"];
  * These routes redirects logged in users to /settings.
  * @type {string[]}
  */
-export const authRoutes = ["/login", "/register", "/error", "/reset"];
+export const authRoutes = [
+  "/login",
+  "/register",
+  "/error",
+  "/reset",
+  "/reset-password",
+];
 
 /**
  * Prefix for the authentication route

@@ -26,3 +26,9 @@ export const ResetSchema = z.object({
     message: "email is required.",
   }),
 });
+
+export const ResetPasswordSchema = z.object({
+  password: z.string().min(6, {
+    message: "password must be at least 6 characters long.",
+  }),
+});

@@ -5,10 +5,14 @@ import { getUserByEmail } from "@/data/user";
 import { getVerificationTokenByToken } from "@/data/verify-token";
 
 interface NewVerificationInterface {
-  token: string;
+  token?: string | null;
 }
 
 export const newVerification = async ({ token }: NewVerificationInterface) => {
+  if (!token) {
+    return { error: "Missing token!" };
+  }
+
   const existingToken = await getVerificationTokenByToken(token);
   if (!existingToken) {
     return { error: "Token does not exist" };
