@@ -3,14 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import authConfig from "@/auth.config";
 import { db } from "@/lib/db";
 import { getUserById } from "@/data/user";
-
-// declare module "next-auth" {
-//   interface Session {
-//     user: {
-//       role: string;
-//     } & DefaultSession["user"];
-//   }
-// }
+import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
@@ -41,6 +34,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
 
         // TODO: 2FA check
+        if (dbUser.isTwoFactorEnabled) {
+          const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+            dbUser.id
+          );
+          
+          if (!twoFactorConfirmation) return false;
+
+          // delete 2FA for next sign in
+          await db.twoFactorConfirmation.delete({
+            where: { id: twoFactorConfirmation.id },
+          });
+
+          return true;
+        }
       }
 
       return true;
