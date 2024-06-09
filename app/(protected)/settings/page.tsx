@@ -1,23 +1,23 @@
-import { auth, signOut } from "@/auth";
+"use client";
+
 import { FC } from "react";
+import { signOut } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 interface SettingsPageProps {}
 
-const SettingsPage: FC<SettingsPageProps> = async () => {
-  const session = await auth();
+const SettingsPage: FC<SettingsPageProps> = () => {
+  const { user } = useCurrentUser();
+
+  const handleClick = () => {
+    signOut();
+  };
 
   return (
-    <div>
-      <p>{JSON.stringify(session)}</p>
-      <form
-        action={async () => {
-          "use server";
-
-          await signOut();
-        }}
-      >
-        <button type="submit">Log Out</button>
-      </form>
+    <div className="bg-white p-10 rounded-xl">
+      <button type="submit" onClick={handleClick}>
+        Log Out
+      </button>
     </div>
   );
 };

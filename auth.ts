@@ -38,7 +38,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
             dbUser.id
           );
-          
+
           if (!twoFactorConfirmation) return false;
 
           // delete 2FA for next sign in
@@ -59,6 +59,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       if (session.user && token.role) {
         session.user.role = token.role;
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
       }
       return session;
     },
@@ -71,6 +72,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
 
       token.role = dbUser.role;
+      token.isTwoFactorEnabled = dbUser.isTwoFactorEnabled;
       return token;
     },
   },
