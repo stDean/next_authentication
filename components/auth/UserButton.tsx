@@ -31,7 +31,7 @@ const UserButton: FC<UserButtonProps> = () => {
 
       <DropdownMenuContent className="w-40" align="end">
         <LogOutButton>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <ExitIcon className="h-4 w-4 mr-2" />
             Log Out
           </DropdownMenuItem>
