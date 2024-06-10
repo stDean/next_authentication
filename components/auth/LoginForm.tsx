@@ -31,6 +31,7 @@ const LoginForm: FC<LoginFormProps> = () => {
   const [isPending, startTransition] = useTransition();
 
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Email already in use with a different provider"
@@ -50,7 +51,7 @@ const LoginForm: FC<LoginFormProps> = () => {
     setSuccess("");
 
     startTransition(() => {
-      login(values)
+      login(values, callbackUrl as string)
         .then(data => {
           if (data?.error) {
             form.reset();

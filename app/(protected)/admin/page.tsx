@@ -5,7 +5,6 @@ import FormSuccess from "@/components/FormSuccess";
 import RoleGate from "@/components/auth/RoleGate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useCurrentUserRole } from "@/hooks/use-current-role";
 import { UserRole } from "@prisma/client";
 import { FC } from "react";
 import { toast } from "sonner";
@@ -13,8 +12,6 @@ import { toast } from "sonner";
 interface AdminPageProps {}
 
 const AdminPage: FC<AdminPageProps> = () => {
-  const { userRole: role } = useCurrentUserRole();
-
   const onApiRouteClick = () => {
     fetch("/api/admin").then(res => {
       if (res.ok) {
